@@ -1,13 +1,18 @@
 package org.example.cincuentazo.controller;
 
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import org.example.cincuentazo.view.mesa_vista;
+
 import java.io.IOException;
 
 /**
@@ -64,30 +69,67 @@ public class controller_mesa {
         }
     }
 }*/
+//    @FXML
+//    private void iniciarJuego(ActionEvent event) throws IOException {
+////        try {
+////            System.out.println("Iniciando juego...");
+////            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/cincuentazo/mesa-juego.fxml"));
+////            System.out.println("FXMLLoader creado...");
+////            Parent root = loader.load();
+////            System.out.println("FXML cargado correctamente");
+////
+////            controller_juego controller = loader.getController();
+////            controller.setNumContrincantes(numContrincantes);
+////
+////            Stage nuevaVentana = new Stage();
+////            nuevaVentana.setTitle("El 50tazo - En juego");
+////            nuevaVentana.setScene(new Scene(root, 1000, 700));
+////            nuevaVentana.show();
+////
+////            System.out.println("Ventana mostrada.");
+////
+////            Stage stageActual = (Stage) btnIniciar.getScene().getWindow();
+////            stageActual.close();
+////
+////        } catch (Exception e) {
+////            System.err.println("❌ Error al iniciar juego: " + e.getMessage());
+////            e.printStackTrace();
+////        }
+//
+//            Node source = (Node) event.getSource();
+//            Stage actualStage = (Stage) source.getScene().getWindow();
+//            actualStage.close();
+//
+//            mesa_vista mesaVista = mesa_vista.getInstance();
+//            mesaVista.show();
+//
+//
+//    }
     @FXML
-    private void iniciarJuego() {
+    private void iniciarJuego(ActionEvent event) {
         try {
-            System.out.println("Iniciando juego...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/cincuentazo/mesa-juego.fxml"));
-            System.out.println("FXMLLoader creado...");
-            Parent root = loader.load();
-            System.out.println("FXML cargado correctamente");
+            System.out.println("🎮 Iniciando juego con " + numContrincantes + " contrincantes...");
 
-            controller_juego controller = loader.getController();
-            controller.setNumContrincantes(numContrincantes);
+            // Cierra la ventana actual
+            Node source = (Node) event.getSource();
+            Stage stageActual = (Stage) source.getScene().getWindow();
 
-            Stage nuevaVentana = new Stage();
-            nuevaVentana.setTitle("El 50tazo - En juego");
-            nuevaVentana.setScene(new Scene(root, 1000, 700));
-            nuevaVentana.show();
+            // Obtiene la instancia del singleton
+            mesa_vista mesaVista = mesa_vista.getInstance();
 
-            System.out.println("Ventana mostrada.");
+            // Configura el número de contrincantes
+            mesaVista.setNumContrincantes(numContrincantes);
 
-            Stage stageActual = (Stage) btnIniciar.getScene().getWindow();
+            // Muestra la ventana de juego
+            mesaVista.show();
+
+            // Cierra la ventana actual
             stageActual.close();
 
+            System.out.println("✅ Juego iniciado exitosamente");
+
         } catch (Exception e) {
-            System.err.println("❌ Error al iniciar juego: " + e.getMessage());
+            System.err.println("❌ Error al iniciar el juego:");
             e.printStackTrace();
         }
     }

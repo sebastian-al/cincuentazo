@@ -75,5 +75,6 @@ public class controller_juego {
         System.out.println("Tomar carta pulsado (lógica por implementar)");
         // Aquí más tarde: robar del mazo, actualizar carta central, actualizar botones del jugador, etc.
     }
+
 }
 

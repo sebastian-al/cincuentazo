@@ -1,4 +1,4 @@
 package org.example.cincuentazo.model;
 
-public class model_mesa {
+public class Card {
 }
