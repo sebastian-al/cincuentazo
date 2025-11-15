@@ -1,38 +1,198 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.cincuentazo.controller.controller_juego"
+            prefWidth="1000" prefHeight="700">
 
-            fx:controller="org.example.cincuentazo.controller.controller_mesa"
-            prefWidth="800" prefHeight="600">
-
-    <!-- Fondo de la mesa -->
-    <ImageView fitWidth="800" fitHeight="600" preserveRatio="false">
+    <!-- Fondo -->
+    <ImageView fitWidth="1000" fitHeight="700" preserveRatio="false">
         <image>
-            <Image url="@imagenmesa.jpg"/>
+            <Image url="@fondodemesa.jpg"/>
         </image>
     </ImageView>
 
-    <!-- Contenedor principal -->
-    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
-          AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
+    <!-- Contenedor principal con el resto de la interfaz -->
+    <BorderPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
 
-        <Label fx:id="lblTitulo" text="Bienvenido al 50tazo"
-               style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, red, 10, 0.5, 0, 0);"/>
+        <!-- ========== ZONA SUPERIOR: Máquinas ========== -->
+        <top>
+            <VBox spacing="15" alignment="CENTER">
+                <!-- Título zona máquinas -->
+                <Label text="JUGADORES MÁQUINA"
+                       style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;
+                              -fx-effect: dropshadow(gaussian, black, 10, 0.7, 0, 2);"/>
 
-        <Label fx:id="lblSubtitulo" text="Elija el número de contrincantes:"
-               style="-fx-font-size: 20px; -fx-text-fill: white;"/>
+                <!-- Contenedor de cartas de máquinas -->
+                <HBox fx:id="contenedorMaquina" alignment="CENTER" spacing="30">
+                    <!-- Las cartas de las máquinas se generarán dinámicamente -->
+                </HBox>
+            </VBox>
+        </top>
 
-        <ComboBox fx:id="comboContrincantes" prefWidth="200"
-                  style="-fx-font-size: 16px; -fx-background-color: white; -fx-border-color: red; -fx-border-radius: 8; -fx-background-radius: 8;"/>
+        <!-- ========== ZONA IZQUIERDA: Mazo ========== -->
+        <left>
+            <VBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
+                <!-- Label del mazo -->
+                <Label text="MAZO"
+                       style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;
+                              -fx-effect: dropshadow(gaussian, black, 8, 0.7, 0, 2);"/>
 
-        <Button fx:id="btnIniciar" text="Iniciar juego"
-                onAction="#iniciarJuego"
-                style="-fx-font-size: 18px; -fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"/>
-    </VBox>
+                <!-- Imagen del mazo -->
+                <StackPane>
+                    <ImageView fx:id="mazoCartas" fitWidth="100" fitHeight="140" preserveRatio="true">
+                        <image>
+                            <Image url="@masodecartas.png"/>
+                        </image>
+                    </ImageView>
+
+                    <!-- Badge con cantidad de cartas restantes -->
+                    <Label fx:id="labelCartasRestantes"
+                           text="52"
+                           style="-fx-background-color: red; -fx-text-fill: white;
+                                  -fx-font-size: 14px; -fx-font-weight: bold;
+                                  -fx-padding: 5 10; -fx-background-radius: 15;"
+                           StackPane.alignment="TOP_RIGHT"
+                           translateX="-10" translateY="10"/>
+                </StackPane>
+
+                <!-- Botón tomar carta -->
+                <Button fx:id="btnTomarCarta"
+                        text="Tomar Carta"
+                        onAction="#tomarCarta"
+                        style="-fx-background-color: #c41e3a; -fx-text-fill: white;
+                               -fx-font-size: 16px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 10 20;
+                               -fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 3);"/>
+            </VBox>
+        </left>
+
+        <!-- ========== ZONA CENTRAL: Mesa de juego ========== -->
+        <center>
+            <VBox alignment="CENTER" spacing="20">
+
+                <!-- Título del juego -->
+                <Label text="CINCUENTAZO"
+                       style="-fx-text-fill: #FFD700; -fx-font-size: 32px; -fx-font-weight: bold;
+                              -fx-effect: dropshadow(gaussian, black, 15, 0.8, 0, 3);"/>
+
+                <!-- Suma actual -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Label text="SUMA:"
+                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;
+                                  -fx-effect: dropshadow(gaussian, black, 8, 0.7, 0, 2);"/>
+                    <Label fx:id="labelSumaMesa"
+                           text="0"
+                           style="-fx-text-fill: #FFD700; -fx-font-size: 32px; -fx-font-weight: bold;
+                                  -fx-effect: dropshadow(gaussian, black, 10, 0.8, 0, 2);"/>
+                </HBox>
+
+                <!-- Carta central en juego -->
+                <StackPane fx:id="mesaCentral"
+                           style="-fx-min-width: 120; -fx-min-height: 160;
+                                  -fx-max-width: 120; -fx-max-height: 160;
+                                  -fx-border-color: white; -fx-border-width: 3;
+                                  -fx-background-color: rgba(255,255,255,0.15);
+                                  -fx-border-radius: 15; -fx-background-radius: 15;
+                                  -fx-effect: dropshadow(gaussian, black, 15, 0.6, 0, 4);">
+                    <!-- La carta en juego aparecerá aquí -->
+                </StackPane>
+
+                <!-- Etiqueta de la mesa -->
+                <Label text="MESA DE JUEGO"
+                       style="-fx-text-fill: white; -fx-font-size: 14px;
+                              -fx-effect: dropshadow(gaussian, black, 6, 0.7, 0, 1);"/>
+            </VBox>
+        </center>
+
+        <!-- ========== ZONA DERECHA: Reglas e Información ========== -->
+        <right>
+            <VBox spacing="15" alignment="CENTER"
+                  style="-fx-padding: 20; -fx-background-color: rgba(0,0,0,0.6);
+                         -fx-background-radius: 15; -fx-border-color: #FFD700;
+                         -fx-border-width: 2; -fx-border-radius: 15;">
+
+                <Label text="⚡ REGLAS ⚡"
+                       style="-fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <Separator prefWidth="150" style="-fx-background-color: #FFD700;"/>
+
+                <VBox spacing="8" style="-fx-padding: 0 10;">
+                    <Label text="🎯 No pasar de 50"
+                           style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+
+                    <Label text="📌 2-8, 10: su valor"
+                           style="-fx-text-fill: #90EE90; -fx-font-size: 11px;"/>
+                    <Label text="📌 9: vale 0"
+                           style="-fx-text-fill: #87CEEB; -fx-font-size: 11px;"/>
+                    <Label text="📌 J, Q, K: restan 10"
+                           style="-fx-text-fill: #FFB6C1; -fx-font-size: 11px;"/>
+                    <Label text="📌 A: vale 1 o 10"
+                           style="-fx-text-fill: #FFFF99; -fx-font-size: 11px;"/>
+                </VBox>
+
+                <Separator prefWidth="150" style="-fx-background-color: #FFD700;"/>
+
+                <!-- Indicador de turno -->
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="TURNO:"
+                           style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <Label fx:id="labelTurnoActual"
+                           text="Jugador"
+                           style="-fx-text-fill: #00FF00; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                </VBox>
+
+                <Separator prefWidth="150" style="-fx-background-color: #FFD700;"/>
+
+                <!-- Estado del juego -->
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="ESTADO:"
+                           style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <Label fx:id="labelEstadoJuego"
+                           text="Juega una carta"
+                           style="-fx-text-fill: yellow; -fx-font-size: 11px;
+                                  -fx-font-style: italic; -fx-wrap-text: true;
+                                  -fx-text-alignment: center; -fx-max-width: 140;"/>
+                </VBox>
+
+            </VBox>
+        </right>
+
+        <!-- ========== ZONA INFERIOR: Cartas del jugador ========== -->
+        <bottom>
+            <VBox spacing="15" alignment="CENTER">
+
+                <!-- Título zona jugador -->
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="TU MANO"
+                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;
+                                  -fx-effect: dropshadow(gaussian, black, 10, 0.7, 0, 2);"/>
+                    <Label text="Haz clic en una carta para jugarla"
+                           style="-fx-text-fill: lightgray; -fx-font-size: 12px;
+                                  -fx-font-style: italic;
+                                  -fx-effect: dropshadow(gaussian, black, 5, 0.5, 0, 1);"/>
+                </VBox>
+
+                <!-- Contenedor de cartas del jugador -->
+                <HBox fx:id="cartasJugador"
+                      alignment="CENTER"
+                      spacing="20"
+                      style="-fx-padding: 15; -fx-min-height: 160;">
+                    <!-- Las cartas del jugador se generarán dinámicamente aquí -->
+                    <!-- Ya NO usamos botones estáticos, se crean en el controlador -->
+                </HBox>
+
+            </VBox>
+        </bottom>
+
+    </BorderPane>
 
 </AnchorPane>

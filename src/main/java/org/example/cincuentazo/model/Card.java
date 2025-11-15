@@ -7,6 +7,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.effect.DropShadow;
 
 public class Card {
+    /**
+     *  Esta es la clase card (carta) la cual determina a la carte y sus atributos
+     *  dentro de la aplicación
+     */
     private String name;
     private int value;
     private Rectangle rectangle;
