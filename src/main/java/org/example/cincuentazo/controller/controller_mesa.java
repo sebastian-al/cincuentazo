@@ -43,32 +43,32 @@ public class controller_mesa {
         comboContrincantes.setOnAction(e -> numContrincantes = comboContrincantes.getValue());
     }
     /**
-    @FXML
-    private void iniciarJuego() {
-        try {
-            // Obtener la ventana actual y cerrarla
-            Stage stageActual = (Stage) btnIniciar.getScene().getWindow();
-            stageActual.close();
+     @FXML
+     private void iniciarJuego() {
+     try {
+     // Obtener la ventana actual y cerrarla
+     Stage stageActual = (Stage) btnIniciar.getScene().getWindow();
+     stageActual.close();
 
-            // Cargar la nueva vista (mesa de juego)
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/cincuentazo/mesa-juego.fxml"));
-            Parent root = loader.load();
+     // Cargar la nueva vista (mesa de juego)
+     FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/cincuentazo/mesa-juego.fxml"));
+     Parent root = loader.load();
 
-            // Pasar el número de contrincantes al nuevo controlador
-            controller_juego controller = loader.getController();
-            controller.setNumContrincantes(numContrincantes);
+     // Pasar el número de contrincantes al nuevo controlador
+     controller_juego controller = loader.getController();
+     controller.setNumContrincantes(numContrincantes);
 
-            // Crear y mostrar la nueva ventana
-            Stage nuevaVentana = new Stage();
-            nuevaVentana.setTitle("El 50tazo - En juego");
-            nuevaVentana.setScene(new Scene(root, 1000, 700));
-            nuevaVentana.show();
+     // Crear y mostrar la nueva ventana
+     Stage nuevaVentana = new Stage();
+     nuevaVentana.setTitle("El 50tazo - En juego");
+     nuevaVentana.setScene(new Scene(root, 1000, 700));
+     nuevaVentana.show();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}*/
+     } catch (IOException e) {
+     e.printStackTrace();
+     }
+     }
+     }*/
 //    @FXML
 //    private void iniciarJuego(ActionEvent event) throws IOException {
 ////        try {

@@ -1,75 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.cincuentazo.controller.controller_juego"
-            prefWidth="1000" prefHeight="700">
 
-    <!-- Fondo -->
-    <ImageView fitWidth="1000" fitHeight="700" preserveRatio="false">
+            fx:controller="org.example.cincuentazo.controller.controller_mesa"
+            prefWidth="800" prefHeight="600">
+
+    <!-- Fondo de la mesa -->
+    <ImageView fitWidth="800" fitHeight="600" preserveRatio="false">
         <image>
-            <Image url="@fondodemesa.jpg"/>
+            <Image url="@imagenmesa.jpg"/>
         </image>
     </ImageView>
 
-    <!-- Contenedor principal con el resto de la interfaz -->
-    <!--<BorderPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
-                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
-                padding="20"> -->
-    <BorderPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
-                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
-        <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
-        </padding>
+    <!-- Contenedor principal -->
+    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+          AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
 
-        <!-- ZONA SUPERIOR: cartas de la máquina -->
-        <top>
-            <HBox fx:id="contenedorMaquina" alignment="CENTER" spacing="30">
-                <!-- Aquí se generarán las cartas de la máquina según el número de contrincantes -->
-            </HBox>
-        </top>
+        <Label fx:id="lblTitulo" text="Bienvenido al 50tazo"
+               style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, red, 10, 0.5, 0, 0);"/>
 
-        <!-- ZONA IZQUIERDA: mazo y botón -->
-        <left>
-            <VBox alignment="CENTER" spacing="10">
-                <ImageView fx:id="mazoCartas" fitWidth="100" fitHeight="140">
-                    <image>
-                        <Image url="@masodecartas.png"/>
-                    </image>
-                </ImageView>
-                <Button text="Tomar carta" onAction="#tomarCarta"
-                        style="-fx-background-color: red; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10;"/>
-            </VBox>
-        </left>
+        <Label fx:id="lblSubtitulo" text="Elija el número de contrincantes:"
+               style="-fx-font-size: 20px; -fx-text-fill: white;"/>
 
-        <!-- ZONA CENTRAL: carta en juego -->
-        <center>
-            <StackPane alignment="CENTER">
-                <Region prefWidth="120" prefHeight="160"
-                        style="-fx-border-color: white; -fx-border-width: 3; -fx-background-color: rgba(255,255,255,0.1); -fx-border-radius: 10;"/>
-            </StackPane>
-        </center>
+        <ComboBox fx:id="comboContrincantes" prefWidth="200"
+                  style="-fx-font-size: 16px; -fx-background-color: white; -fx-border-color: red; -fx-border-radius: 8; -fx-background-radius: 8;"/>
 
-        <!-- ZONA INFERIOR: cartas del jugador humano -->
-        <bottom>
-            <HBox fx:id="cartasJugador" alignment="CENTER" spacing="20">
-                <Button text="Carta 1" prefWidth="80" prefHeight="110"
-                        style="-fx-background-color: white; -fx-border-color: red; -fx-font-weight: bold;"/>
-                <Button text="Carta 2" prefWidth="80" prefHeight="110"
-                        style="-fx-background-color: white; -fx-border-color: red; -fx-font-weight: bold;"/>
-                <Button text="Carta 3" prefWidth="80" prefHeight="110"
-                        style="-fx-background-color: white; -fx-border-color: red; -fx-font-weight: bold;"/>
-                <Button text="Carta 4" prefWidth="80" prefHeight="110"
-                        style="-fx-background-color: white; -fx-border-color: red; -fx-font-weight: bold;"/>
-            </HBox>
-        </bottom>
-
-    </BorderPane>
+        <Button fx:id="btnIniciar" text="Iniciar juego"
+                onAction="#iniciarJuego"
+                style="-fx-font-size: 18px; -fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"/>
+    </VBox>
 
 </AnchorPane>
-
-
