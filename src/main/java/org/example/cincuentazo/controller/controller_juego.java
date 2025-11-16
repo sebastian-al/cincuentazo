@@ -11,6 +11,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.example.cincuentazo.model.*;
+import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -162,6 +166,10 @@ public class controller_juego {
             labelSumaMesa.setStyle("-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;");
         }
     }
+
+    /**
+     * actualiza el label que muestra las cartas que le quedan al mazo
+     */
     private void actualizarCartasMazo(){
         labelCartasRestantes.setText(String.valueOf(mazo.cartasRestantes()));
     }
@@ -196,6 +204,11 @@ public class controller_juego {
             cartasJugador.getChildren().add(cartaPane);
         }
     }
+
+    /**
+     * actualiza el label muestra el turno del jugador
+     * @param turno jugador al que le corresponde el turno
+     */
     private void actualizarTurno(String turno){
         labelTurnoActual.setText(turno);
     }
@@ -208,16 +221,8 @@ public class controller_juego {
 
         // Si es As, elegir el mejor valor (1 o 10)
         if (carta.isAce()) {
-            int sumaConAs10 = mesa.getValorMesa() + 10;
-            int sumaConAs1 = mesa.getValorMesa() + 1;
-
-            // Elegir la opción que no pase de 50
-            if (sumaConAs10 <= 50) {
-                nuevaSuma = sumaConAs10;
-                System.out.println("🃏 As jugado con valor 10");
-            } else {
-                nuevaSuma = sumaConAs1;
-                System.out.println("🃏 As jugado con valor 1");
+            if (pedirValorAs()){
+                carta.getAlternativeValue();
             }
         }
 
@@ -297,6 +302,10 @@ public class controller_juego {
         actualizarCartasMazo();
         btnTomarCarta.setDisable(true);
     }
+
+    /**
+     * Permite al jugador pasar de turno para que comiencen a jugar la(s) maquina(s)
+     */
     @FXML
     private void pasarTurno(){
         if (!cartaJugadaEnTurno) {
@@ -313,6 +322,11 @@ public class controller_juego {
         botsEnJuego= 0;
         jugarBotsPorTurno(0);
     }
+
+    /**
+     * Metodo que gestiona el turno de los bots para jugar sus cartas y robar cartas del mazo
+     * @param index indice del bot al que le toca el turno
+     */
     private void jugarBotsPorTurno(int index) {
 
         if (index >= bots.size()) {
@@ -360,6 +374,9 @@ public class controller_juego {
         }).start();
     }
 
+    /**
+     * Despues del turno de los bots gestiona el turno del jugador y verifica si este gano o tiene alguna carta jugable
+     */
     private void volverTurnoJugador() {
         actualizarTurno("Jugador");
         btnTomarCarta.setDisable(true);
@@ -426,11 +443,22 @@ public class controller_juego {
         asignarNombres(bots);
         iniciarJuego();
     }
+
+    /**
+     * le asigna nombres a los bots del juego
+     * @param jugadores lista con todos los bots del juego
+     */
     private void asignarNombres(List<JugadorMaquina> jugadores) {
         for (int i = 0; i< jugadores.size(); i++) {
             jugadores.get(i).setNombre("Máquina " + (i + 1));
         }
     }
+
+    /**
+     * este metodo permite mostrar una alerta al jugador y darle feedback de la partida
+     * @param titulo titulo de la alerta
+     * @param contenido contenido de la alerta
+     */
     private void mostrarAlerta(String titulo, String contenido) {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
         alerta.setTitle(titulo);
@@ -438,4 +466,29 @@ public class controller_juego {
         alerta.setContentText(contenido);
         alerta.showAndWait();
     }
+    /**
+     * Muestra una ventana emergente para que el usuario pueda escoger el valor del AS
+     */
+    public  boolean pedirValorAs() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/cincuentazo/as-eleccion.fxml"));
+            Parent root = loader.load();
+            AsValorController controller = loader.getController();
+            Stage stage = new Stage();
+            stage.setTitle("Escoge valor del As");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+
+
+            stage.showAndWait();
+
+            return controller.getResultado();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }

@@ -135,8 +135,8 @@ public class Card {
      * Obtiene el valor alternativo (solo para Ases).
      * @return 10 si es As, el valor normal en caso contrario
      */
-    public int getAlternativeValue() {
-        return isAce() ? 10 : value;
+    public void getAlternativeValue() {
+        value=10;
     }
 
     @Override

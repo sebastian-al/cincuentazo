@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 public interface Player {
     List<Card> getMano();
+    // Toma las 4 cartas iniciales del mazo y las agrega a su mano
     default void manoInicial(Deck mazo) {
         getMano().clear();
         try {
