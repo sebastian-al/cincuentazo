@@ -1,8 +1,12 @@
 package org.example.cincuentazo.model;
+import java.util.ArrayList;
 import java.util.List;
 
-public class JugadorAdaptador implements Player {
+public  class JugadorAdaptador implements Player {
     protected List<Card> mano;
+    public JugadorAdaptador() {
+        this.mano = new ArrayList<>();
+    }
     @Override
     public void robarCarta(Deck mazo) {
         Card carta = mazo.tomarCarta();
@@ -15,6 +19,6 @@ public class JugadorAdaptador implements Player {
     public List<Card> getMano() {
         return mano;
     }
-    public void jugarCarta(Mesa mesa){
+    public void jugarCarta(Mesa mesa, Card carta) {
     }
 }

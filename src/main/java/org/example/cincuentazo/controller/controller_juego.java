@@ -1,6 +1,8 @@
 package org.example.cincuentazo.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -8,8 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.example.cincuentazo.model.Card;
-import org.example.cincuentazo.model.Deck;
+import org.example.cincuentazo.model.*;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -40,6 +41,9 @@ public class controller_juego {
     private Button btnTomarCarta;
 
     @FXML
+    private  Button btnPasarTurno;
+
+    @FXML
     private Label labelCartasRestantes; // Muestra cartas restantes en el mazo
 
     @FXML
@@ -49,12 +53,12 @@ public class controller_juego {
     private Label labelEstadoJuego; // Muestra el estado actual del juego
 
     private Deck mazo;
-    private List<Card> manoJugador;
-    private List<Card> cartasEnMesa; // Cartas jugadas en la mesa
-    private int sumaMesa;
+    private final JugadorHumano usuario= new JugadorHumano();
+    private final Mesa mesa= new Mesa();
     private int numContrincantes = 1;
+    private int botsEnJuego =0;
     private boolean cartaJugadaEnTurno = false; // Control para verificar si jugó carta antes de robar
-
+    private final List<JugadorMaquina> bots= new ArrayList<>();;
     /**
      * Establece el número de contrincantes máquina (1-3).
      */
@@ -69,12 +73,6 @@ public class controller_juego {
     @FXML
     public void initialize() {
         mazo = new Deck();
-        manoJugador = new ArrayList<>();
-        cartasEnMesa = new ArrayList<>();
-        sumaMesa = 0;
-
-        // Iniciar el juego
-        iniciarJuego();
     }
 
     /**
@@ -101,17 +99,14 @@ public class controller_juego {
      */
     private void repartirManosIniciales() {
         // Repartir al jugador humano
-        for (int i = 0; i < 4; i++) {
-            Card carta = mazo.tomarCarta();
-            if (carta != null) {
-                manoJugador.add(carta);
-            }
-        }
-
+        usuario.manoInicial(mazo);
         // Mostrar cartas del jugador
         actualizarCartasJugador();
-
-        System.out.println("✅ Mano inicial repartida: " + manoJugador.size() + " cartas");
+        for (JugadorMaquina bot : bots){
+            bot.manoInicial(mazo);
+        }
+        System.out.println("✅ Mano inicial repartida: 4 cartas");
+        actualizarCartasMazo();
     }
 
     /**
@@ -121,14 +116,13 @@ public class controller_juego {
         Card cartaInicial = mazo.tomarCarta();
 
         if (cartaInicial != null) {
-            cartasEnMesa.add(cartaInicial);
-            sumaMesa = cartaInicial.getValue();
-
+            mesa.agregarCarta(cartaInicial);
             System.out.println("🃏 Carta inicial en mesa: " + cartaInicial.getName() + " (Valor: " + cartaInicial.getValue() + ")");
-            System.out.println("📊 Suma inicial de la mesa: " + sumaMesa);
+            System.out.println("📊 Suma inicial de la mesa: " + mesa.getValorMesa());
 
             actualizarMesaCentral();
             actualizarLabelSuma();
+            actualizarCartasMazo();
         }
     }
 
@@ -138,8 +132,8 @@ public class controller_juego {
     private void actualizarMesaCentral() {
         mesaCentral.getChildren().clear();
 
-        if (!cartasEnMesa.isEmpty()) {
-            Card ultimaCarta = cartasEnMesa.get(cartasEnMesa.size() - 1);
+        if (!mesa.estaVacio()) {
+            Card ultimaCarta = mesa.ultimaCarta();
 
             // Crear StackPane con fondo y carta
             StackPane cartaPane = new StackPane();
@@ -156,25 +150,28 @@ public class controller_juego {
      * Actualiza el label que muestra la suma actual de la mesa.
      */
     private void actualizarLabelSuma() {
-        labelSumaMesa.setText("Suma: " + sumaMesa);
+        int valorMesa = mesa.getValorMesa();
+        labelSumaMesa.setText(String.valueOf(valorMesa));
 
         // Cambiar color según la cercanía a 50
-        if (sumaMesa > 40) {
+        if (valorMesa > 40) {
             labelSumaMesa.setStyle("-fx-text-fill: red; -fx-font-size: 24px; -fx-font-weight: bold;");
-        } else if (sumaMesa > 30) {
+        } else if (valorMesa > 30) {
             labelSumaMesa.setStyle("-fx-text-fill: orange; -fx-font-size: 24px; -fx-font-weight: bold;");
         } else {
             labelSumaMesa.setStyle("-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;");
         }
     }
-
+    private void actualizarCartasMazo(){
+        labelCartasRestantes.setText(String.valueOf(mazo.cartasRestantes()));
+    }
     /**
      * Actualiza la visualización de las cartas del jugador.
      */
     private void actualizarCartasJugador() {
         cartasJugador.getChildren().clear();
-
-        for (Card carta : manoJugador) {
+        List<Card> manoUsuario = usuario.getMano();
+        for (Card carta : manoUsuario) {
             StackPane cartaPane = new StackPane();
             cartaPane.getChildren().addAll(
                     carta.getBackground(),
@@ -199,18 +196,20 @@ public class controller_juego {
             cartasJugador.getChildren().add(cartaPane);
         }
     }
-
+    private void actualizarTurno(String turno){
+        labelTurnoActual.setText(turno);
+    }
     /**
      * Intenta jugar una carta del jugador en la mesa.
      */
     private void jugarCarta(Card carta, StackPane cartaPane) {
         // Calcular nueva suma
-        int nuevaSuma = sumaMesa + carta.getValue();
+        int nuevaSuma = mesa.getValorMesa() + carta.getValue();
 
         // Si es As, elegir el mejor valor (1 o 10)
         if (carta.isAce()) {
-            int sumaConAs10 = sumaMesa + 10;
-            int sumaConAs1 = sumaMesa + 1;
+            int sumaConAs10 = mesa.getValorMesa() + 10;
+            int sumaConAs1 = mesa.getValorMesa() + 1;
 
             // Elegir la opción que no pase de 50
             if (sumaConAs10 <= 50) {
@@ -225,7 +224,7 @@ public class controller_juego {
         // Verificar si la jugada es válida
         if (nuevaSuma > 50) {
             System.err.println("❌ No puedes jugar esa carta, excede 50");
-            System.err.println("   Suma actual: " + sumaMesa + " + Carta: " + carta.getValue() + " = " + nuevaSuma);
+            System.err.println("   Suma actual: " + mesa.getValorMesa() + " + Carta: " + carta.getValue() + " = " + nuevaSuma);
 
             // Efecto visual de rechazo
             cartaPane.setStyle("-fx-effect: dropshadow(gaussian, red, 10, 0.5, 0, 0);");
@@ -244,12 +243,10 @@ public class controller_juego {
         }
 
         // Jugada válida: actualizar estado
-        sumaMesa = nuevaSuma;
-        manoJugador.remove(carta);
-        cartasEnMesa.add(carta);
+        usuario.jugarCarta(mesa, carta);
 
         System.out.println("✅ Carta jugada: " + carta.getName() + " (Valor: " + carta.getValue() + ")");
-        System.out.println("📊 Nueva suma: " + sumaMesa);
+        System.out.println("📊 Nueva suma: " + mesa.getValorMesa());
 
         // Actualizar visualización
         actualizarMesaCentral();
@@ -259,37 +256,22 @@ public class controller_juego {
         // Marcar que ya jugó carta y habilitar botón de robar
         cartaJugadaEnTurno = true;
         btnTomarCarta.setDisable(false);
-
-        // Verificar si el jugador puede seguir jugando
-        verificarSiPuedeJugar();
     }
 
     /**
      * Verifica si el jugador tiene al menos una carta jugable.
      */
-    private void verificarSiPuedeJugar() {
-        boolean puedeJugar = false;
-
-        for (Card carta : manoJugador) {
-            int valorCarta = carta.getValue();
-
-            // Si es As, considerar ambos valores
-            if (carta.isAce()) {
-                if (sumaMesa + 1 <= 50 || sumaMesa + 10 <= 50) {
-                    puedeJugar = true;
-                    break;
-                }
-            } else {
-                if (sumaMesa + valorCarta <= 50) {
-                    puedeJugar = true;
-                    break;
-                }
+    private boolean verificarSiPuedeJugar() {
+        int cartasJugables=0;
+        for (Card carta : usuario.getMano()) {
+            if (carta.getValue()+mesa.getValorMesa() <= 50) {
+                cartasJugables++;
             }
         }
-
-        if (!puedeJugar && manoJugador.size() > 0) {
-            System.err.println("💀 JUGADOR ELIMINADO - No tiene cartas jugables");
-            // Aquí implementarías la lógica de eliminación
+        if (cartasJugables==0) {
+            return false;
+        } else  {
+            return true;
         }
     }
 
@@ -306,55 +288,90 @@ public class controller_juego {
 
         // Verificar si el mazo necesita recargarse
         if (mazo.estaVacio()) {
-            recargarMazo();
+            mesa.agregarCartasBaraja(mazo);
+            mazo.barajar();
         }
 
-        Card nuevaCarta = mazo.tomarCarta();
-
-        if (nuevaCarta != null) {
-            manoJugador.add(nuevaCarta);
-            System.out.println("✅ Carta tomada: " + nuevaCarta.getName());
-
-            actualizarCartasJugador();
-
-            // Resetear turno
-            cartaJugadaEnTurno = false;
-            btnTomarCarta.setDisable(true);
-
-            System.out.println("🔄 Turno terminado. Ahora juega la máquina...");
-            // Aquí llamarías al turno de la máquina
-        } else {
-            System.err.println("❌ No se pudo tomar carta del mazo");
-        }
+        usuario.robarCarta(mazo);
+        actualizarCartasJugador();
+        actualizarCartasMazo();
+        btnTomarCarta.setDisable(true);
     }
-
-    /**
-     * Recarga el mazo con las cartas de la mesa (excepto la última).
-     */
-    private void recargarMazo() {
-        System.out.println("♻️ Recargando mazo...");
-
-        if (cartasEnMesa.size() <= 1) {
-            System.err.println("⚠️ No hay suficientes cartas en la mesa para recargar");
+    @FXML
+    private void pasarTurno(){
+        if (!cartaJugadaEnTurno) {
+            mostrarAlerta("Alerta", "Debes haber jugado una carta para pasar de turno");
             return;
         }
 
-        // Guardar la última carta
-        Card ultimaCarta = cartasEnMesa.remove(cartasEnMesa.size() - 1);
+        if (usuario.cantidadCartasMano() != 4) {
+            mostrarAlerta("Alerta", "Debes tener 4 cartas en tu mano para pasar de turno");
+            return;
+        }
+        btnTomarCarta.setDisable(true);
+        btnPasarTurno.setDisable(true);
+        botsEnJuego= 0;
+        jugarBotsPorTurno(0);
+    }
+    private void jugarBotsPorTurno(int index) {
 
-        // Agregar las demás cartas al mazo
-        for (Card carta : cartasEnMesa) {
-            mazo.agregarCarta(carta);
+        if (index >= bots.size()) {
+            // Ya jugaron todos los bots y vuelve al jugador
+            volverTurnoJugador();
+            return;
         }
 
-        // Limpiar lista de cartas en mesa y dejar solo la última
-        cartasEnMesa.clear();
-        cartasEnMesa.add(ultimaCarta);
+        JugadorMaquina bot = bots.get(index);
 
-        // Barajar el mazo
-        mazo.barajar();
+        if (!bot.getPuedeJugar(mesa)) {
+            // Saltar bots que no puedan jugar
+            mostrarAlerta("JUGADOR ELIMINADO", "La "+bot.getNombre()+ "no tiene más cartas jugables, sale del juego.");
+            bot.devolverCartas(mazo);
+            jugarBotsPorTurno(index + 1);
+            return;
+        }
 
-        System.out.println("✅ Mazo recargado con " + mazo.cartasRestantes() + " cartas");
+        actualizarTurno(bot.getNombre());
+        botsEnJuego++;
+        new Thread(() -> {
+            try {
+
+                Thread.sleep(3500);
+
+                bot.jugarCarta(mesa, bot.elegirMejorCarta(mesa));
+                if(mazo.estaVacio()) {
+                    mesa.agregarCartasBaraja(mazo);
+                    mazo.barajar();
+                }
+                bot.robarCarta(mazo);
+
+                Platform.runLater(() -> {
+                    actualizarMesaCentral();
+                    actualizarLabelSuma();
+                    actualizarCartasMazo();
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Platform.runLater(() -> jugarBotsPorTurno(index + 1));
+
+        }).start();
+    }
+
+    private void volverTurnoJugador() {
+        actualizarTurno("Jugador");
+        btnTomarCarta.setDisable(true);
+        btnPasarTurno.setDisable(false);
+        if (botsEnJuego == 0) {
+            mostrarAlerta("GANASTE","No hay mas máquinas que puedan seguir jugando.");
+            Platform.exit();
+        }
+        if(!verificarSiPuedeJugar()) {
+            mostrarAlerta("PERDISTE", "No tienes ninguna carta jugable, perdiste el juego.");
+            Platform.exit();
+        }
     }
 
     /**
@@ -404,20 +421,21 @@ public class controller_juego {
 
             zonaMaquina.getChildren().addAll(nombreMaquina, filaCartas);
             contenedorMaquina.getChildren().add(zonaMaquina);
+            bots.add(new JugadorMaquina());
+        }
+        asignarNombres(bots);
+        iniciarJuego();
+    }
+    private void asignarNombres(List<JugadorMaquina> jugadores) {
+        for (int i = 0; i< jugadores.size(); i++) {
+            jugadores.get(i).setNombre("Máquina " + (i + 1));
         }
     }
-
-    /**
-     * Obtiene la suma actual de la mesa.
-     */
-    public int getSumaMesa() {
-        return sumaMesa;
-    }
-
-    /**
-     * Obtiene el número de cartas en la mesa.
-     */
-    public int getNumeroCartasEnMesa() {
-        return cartasEnMesa.size();
+    private void mostrarAlerta(String titulo, String contenido) {
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(contenido);
+        alerta.showAndWait();
     }
 }

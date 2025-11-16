@@ -1,13 +1,12 @@
 package org.example.cincuentazo.model;
 
-public class JugadorHumano extends JugadorAdaptador{
+public  class JugadorHumano extends JugadorAdaptador{
     @Override
-    public void jugarCarta(Mesa mesa){
-        int indice = pedirCartaUsuario();
-        mesa.agregarCarta(mano.get(indice));
-        mano.remove(indice);
+    public void jugarCarta(Mesa mesa, Card carta){
+        mesa.agregarCarta(carta);
+        mano.remove(carta);
     }
-    private int pedirCartaUsuario(){
-        return 0;
+    public int cantidadCartasMano(){
+        return mano.size();
     }
 }

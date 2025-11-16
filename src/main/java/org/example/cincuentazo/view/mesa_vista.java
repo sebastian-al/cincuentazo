@@ -20,11 +20,10 @@ import java.io.IOException;
 public class mesa_vista extends Stage{
 
 
-        private final controller_juego controllerJuego;
+    private final controller_juego controllerJuego;
     private static mesa_vista instance;
     private Stage stage;
     private Parent root;
-    private controller_juego controller;
     private int numContrincantes = 1;
 
         /**
@@ -34,11 +33,11 @@ public class mesa_vista extends Stage{
          *  * @throws IOException si ocurre un problema al cargar el archivo FXML
          */
         public mesa_vista() throws IOException {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/cincuentazo/mesa-juego.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/cincuentazo/hello-view.fxml"));
             Parent root = loader.load();
             this.setTitle("Cincuentazo");
             this.controllerJuego = loader.getController();
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 1200, 800);
             this.setScene(scene);
             this.setResizable(false);
             this.show();
@@ -74,9 +73,7 @@ public class mesa_vista extends Stage{
 
     public void setNumContrincantes(int numContrincantes) {
         this.numContrincantes = numContrincantes;
-        if (controller != null) {
-            controller.setNumContrincantes(numContrincantes);
-        }
+        controllerJuego.setNumContrincantes(numContrincantes);
     }
      }
 
