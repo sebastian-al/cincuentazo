@@ -24,7 +24,7 @@ public class JugadorMaquina extends JugadorAdaptador {
         if (valorMesa<40){
             int indiceMayor =0;
             for (int i=0; i<4; i++){
-                if(mano.get(i).getValue()>valorMesa){
+                if(mano.get(i).getValue()>mano.get(indiceMayor).getValue()){
                     indiceMayor=i;
                 }
             }
@@ -73,7 +73,7 @@ public class JugadorMaquina extends JugadorAdaptador {
     public void devolverCartas(Deck mazo){
         for (Card card : mano){
             mazo.agregarCarta( card);
-            mano.remove(card);
         }
+        mano.clear();
     }
 }

@@ -69,6 +69,7 @@ public class controller_juego {
     public void setNumContrincantes(int numContrincantes) {
         this.numContrincantes = Math.max(1, Math.min(3, numContrincantes));
         generarMaquinas();
+        botsEnJuego = numContrincantes;
     }
 
     /**
@@ -319,7 +320,6 @@ public class controller_juego {
         }
         btnTomarCarta.setDisable(true);
         btnPasarTurno.setDisable(true);
-        botsEnJuego= 0;
         jugarBotsPorTurno(0);
     }
 
@@ -339,14 +339,14 @@ public class controller_juego {
 
         if (!bot.getPuedeJugar(mesa)) {
             // Saltar bots que no puedan jugar
-            mostrarAlerta("JUGADOR ELIMINADO", "La "+bot.getNombre()+ "no tiene más cartas jugables, sale del juego.");
+            mostrarAlerta("JUGADOR ELIMINADO", "La "+bot.getNombre()+ " no tiene más cartas jugables, sale del juego.");
+            botsEnJuego = botsEnJuego -1;
             bot.devolverCartas(mazo);
             jugarBotsPorTurno(index + 1);
             return;
         }
 
         actualizarTurno(bot.getNombre());
-        botsEnJuego++;
         new Thread(() -> {
             try {
 
@@ -383,6 +383,7 @@ public class controller_juego {
         btnPasarTurno.setDisable(false);
         if (botsEnJuego == 0) {
             mostrarAlerta("GANASTE","No hay mas máquinas que puedan seguir jugando.");
+            System.out.println("GANASTE");
             Platform.exit();
         }
         if(!verificarSiPuedeJugar()) {
